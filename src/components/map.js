@@ -1,24 +1,29 @@
 import React, { Component } from 'react';
 import { generate } from 'dungeon-factory';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 
 import Player from './player';
 import Enemy from './enemy';
 
 import potionImg from '../../assets/img/potion.png';
+import hammerImg from '../../assets/img/hammer.png';
+import maceImg  from '../../assets/img/mace.png';
+import crossbowImg from '../../assets/img/crossbow.png';
 import swordImg from '../../assets/img/sword.png';
 import wallImg from '../../assets/img/wall.png';
 import floorImg from '../../assets/img/floor.png';
 import bloodstainImg from '../../assets/img/bloodstain.png';
-import playerUpImg from '../../assets/img/playerUp.png';
-import playerDownImg from '../../assets/img/playerDown.png';
-import playerLeftImg from '../../assets/img/playerLeft.png';
-import playerRightImg from '../../assets/img/playerRight.png';
+import playerUpImg from '../../assets/img/player_up.png';
+import playerDownImg from '../../assets/img/player_down.png';
+import playerLeftImg from '../../assets/img/player_left.png';
+import playerRightImg from '../../assets/img/player_right.png';
 import twoheadImg from '../../assets/img/twohead.png';
 import skeletonImg from '../../assets/img/skeleton.png';
 import demonImg from '../../assets/img/demon.png';
 import bossImg from '../../assets/img/boss.png';
 
-export default class Map extends Component {
+class Map extends Component {
   constructor(props) {
     super(props);
 
@@ -26,8 +31,8 @@ export default class Map extends Component {
       map: null,
       canvasWidth: 850,
       canvasHeight: 850,
-      numRows: 41,
-      numCols: 41,
+      numRows: 29,
+      numCols: 29,
       cellWidth: null,
       cellHeight: null,
       player: null,
@@ -44,6 +49,7 @@ export default class Map extends Component {
   componentDidUpdate() {
     this.drawCanvas();
     this.isGameOver();
+    console.log(this.visibleIndexes(this.state.player.row, this.state.player.col, 10));
     // console.log(this.state.player);
   }
 
@@ -52,7 +58,7 @@ export default class Map extends Component {
 
     const objects = [];
 
-    for (let i = 0; i < 29; i++) {
+    for (let i = 0; i < 26; i++) {
       const { row, col } = this.generateRandomCoordinates(map, this.state.numRows, this.state.numCols);
 
       if (i === 0) objects.push({ type: 'player', attr: new Player(row, col), row, col });
@@ -60,24 +66,20 @@ export default class Map extends Component {
       if (i >= 5 && i < 9) objects.push({ type: 'enemy', attr: new Enemy(row, col, 'medium'), row, col });
       if (i >= 9 && i < 13) objects.push({ type: 'enemy', attr: new Enemy(row, col, 'hard'), row, col });
       if (i === 14) objects.push({ type: 'boss', attr: new Enemy(row, col, 'boss'), row, col });
-      if (i >= 15 && i < 25) objects.push({ type: 'potion', attr: null, row, col });
-      if (i >= 25) objects.push({ type: 'weapon', attr: null, row, col });
+      if (i >= 15 && i < 22) objects.push({ type: 'potion', attr: null, row, col });
+      if (i >= 22) objects.push({ type: 'weapon', attr: null, row, col });
     }
 
     objects.forEach(object => {
       const { row, col, type, attr } = object;
 
-      // if (!map.tiles[row]) return console.log('!row');
-      // else if (!map.tiles[row][col]) return console.log('!col', 'row', row, 'col', col);
-
       map.tiles[row][col].type = type;
       if (attr !== null) map.tiles[row][col].attr = attr;
     });
-    console.log(objects[0].attr);
 
     this.setState({ map, player: objects[0].attr, boss: objects[13].attr });
-
-    setTimeout(() => console.log(this.state.player), 100);
+    this.props.updateMap(map);
+    this.props.updatePlayer(objects[0].attr);
   }
 
 
@@ -97,6 +99,8 @@ export default class Map extends Component {
   defineDimensions(canvasWidth, canvasHeight, numCols, numRows) {
     const cellWidth = canvasWidth / numCols;
     const cellHeight = canvasHeight / numRows;
+    // const cellWidth = canvasWidth / (numCols / 4);
+    // const cellHeight = canvasHeight / (numRows / 4);
     this.setState({ canvasWidth, canvasHeight, cellWidth, cellHeight })
   }
 
@@ -137,34 +141,40 @@ export default class Map extends Component {
     map.tiles[row][col].attr = 'floor';
 
     this.setState({ map, player });
+    this.props.updateMap(map);
+    this.props.updatePlayer(player);
+    this.props.updateEnemy(null);
   }
 
   equipWeapon() {
     const { player } = this.state;
     player.upgradeWeapon();
     this.setState({ player });
+    this.props.updatePlayer(player);
   }
 
   replenishHealth() {
     const { player } = this.state;
-    player.replenishHealth(50);
+    player.replenishHealth(75);
     this.setState({ player });
+    this.props.updatePlayer(player);
   }
 
   fight(enemy) {
     const { player } = this.state;
-    // debugger;
+
     const playerStrike = player.giveDamage();
     const enemyStrike = enemy.giveDamage();
     const xp = enemy.xp;
 
     enemy.receiveDamage(playerStrike);
     player.receiveDamage(enemyStrike);
-    console.log(player);
-    console.log(enemy);
+
+    this.props.updateEnemy(enemy);
     if (!enemy.living) player.upgradeXp(xp);
 
     this.setState({ player });
+    this.props.updatePlayer(player);
 
     return enemy.living;
   }
@@ -197,12 +207,13 @@ export default class Map extends Component {
     const { player } = this.state;
     player.changeDirection(direction);
     this.setState({ player });
+    this.props.updatePlayer(player);
   }
 
   isGameOver() {
     if (this.state.player && this.state.boss) {
-      if (this.state.player.living === false || this.state.boss.living === false) console.log('gameover');;
-      // else return false;
+      if (this.state.player.living === false || this.state.boss.living === false) this.props.checkGameOver(true);
+      else this.props.checkGameOver(false);
     }
 
   }
@@ -217,11 +228,28 @@ export default class Map extends Component {
     ctx.drawImage(image, col, row, cellWidth, cellHeight);
   }
 
+  visibleIndexes(playerRow, playerCol, distance) {
+    const { numRows, numCols} = this.state;
+
+    let rowLowerLimit = playerRow - distance;
+    let rowUpperLimit = playerRow + distance;
+
+    if (rowLowerLimit < 0) {
+      rowLowerLimit -= rowLowerLimit;
+      rowUpperLimit -= rowLowerLimit;
+    } else if (rowUpperLimit > numRows) {
+      rowLowerLimit -= (rowUpperLimit - numRows);
+      rowLowerLimit -= (rowUpperLimit - numRows);
+    }
+
+    return { rowLowerLimit, rowUpperLimit };
+  }
+
   // draw the canvas
   drawCanvas() {
     if (!this.state.map) return -1;
 
-    const { cellWidth, cellHeight } = this.state;
+    const { cellWidth, cellHeight, player } = this.state;
 
     const wall = new Image();
     const potion = new Image();
@@ -231,6 +259,9 @@ export default class Map extends Component {
     const playerDown = new Image();
     const playerLeft = new Image();
     const playerRight = new Image();
+    const hammer = new Image();
+    const mace = new Image();
+    const crossbow = new Image();
     const sword = new Image();
     const skeleton = new Image();
     const twohead = new Image();
@@ -245,12 +276,23 @@ export default class Map extends Component {
     playerDown.src = playerDownImg;
     playerLeft.src = playerLeftImg;
     playerRight.src = playerRightImg;
+    hammer.src = hammerImg;
+    mace.src = maceImg;
+    crossbow.src = crossbowImg;
     sword.src = swordImg;
     skeleton.src = skeletonImg;
     twohead.src = twoheadImg;
     demon.src = demonImg;
     boss.src = bossImg;
 
+    // const visibleMap =
+    // //
+    //
+    //   for (int y = player.pos.y - display.height / 2; y < display.height; y++)  {
+    //     for (int x = player.pos.x - display.width / 2; x < display.width; x++) {
+    //       //Equivalent VisMap Position = BigMap[x, y];
+    //     }
+    //   }
     this.state.map.tiles.forEach((row, rowIndex) => {
       row.forEach((Tile, cellIndex) => {
         const ctx = this.refs.canvas.getContext('2d');
@@ -270,15 +312,18 @@ export default class Map extends Component {
         else if (Tile.type === 'enemy' && Tile.attr.difficulty === 'hard') this.drawImage(ctx, demon, cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
         else if (Tile.type === 'boss') this.drawImage(ctx, boss, cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
         else if (Tile.type === 'potion') this.drawImage(ctx, potion, cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
-        else if (Tile.type === 'weapon') this.drawImage(ctx, sword, cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
-
-        // ctx.fillRect(cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
-        // ctx.drawImage(potion, 10, 10, cellWidth, cellHeight)
+        else if (Tile.type === 'weapon') {
+          if (this.state.player.weaponIndex === 0) this.drawImage(ctx, hammer, cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
+          if (this.state.player.weaponIndex === 1) this.drawImage(ctx, mace, cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
+          if (this.state.player.weaponIndex === 2) this.drawImage(ctx, crossbow, cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
+          if (this.state.player.weaponIndex === 3) this.drawImage(ctx, sword, cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
+        }
       });
     });
   }
 
   render() {
+
     return(
       <canvas
         ref="canvas"
@@ -288,3 +333,5 @@ export default class Map extends Component {
     );
   }
 };
+
+export default connect(null, actions)(Map);

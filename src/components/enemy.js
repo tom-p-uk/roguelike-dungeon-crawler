@@ -1,3 +1,8 @@
+import twoheadImg from '../../assets/img/twohead_transparent.png';
+import skeletonImg from '../../assets/img/skeleton_transparent.png';
+import demonImg from '../../assets/img/demon_transparent.png';
+import bossImg from '../../assets/img/boss_transparent.png';
+
 export default class Enemy {
   constructor(row, col, difficulty) {
     this.row = row;
@@ -7,6 +12,7 @@ export default class Enemy {
     this.living = true;
     this.damage = this.setDamage();
     this.xp = this.setXp();
+    this.img = this.setImg();
   }
 
   die() {
@@ -19,8 +25,10 @@ export default class Enemy {
 
   receiveDamage(amount) {
     if (this.health - amount > 0) this.health -= amount;
-    else this.die();
-
+    else {
+      this.health = 0;
+      this.die();
+    }
   }
 
   setDamage() {
@@ -38,6 +46,13 @@ export default class Enemy {
     if (this.difficulty === 'easy') return 100;
     if (this.difficulty === 'medium') return 125;
     if (this.difficulty === 'hard') return 150;
-    if (this.difficulty === 'boss') return 300;
+    if (this.difficulty === 'boss') return 500;
+  }
+
+  setImg() {
+    if (this.difficulty === 'easy') return twoheadImg;
+    if (this.difficulty === 'medium') return skeletonImg;
+    if (this.difficulty === 'hard') return demonImg;
+    if (this.difficulty === 'boss') return bossImg;
   }
 };

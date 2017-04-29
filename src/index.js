@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import reducers from './reducers';
 
 import '../assets/css/styles.css';
+import App from './components/app';
 import Map from './components/map';
 
 const createStoreWithMiddleware = applyMiddleware()(createStore);
@@ -13,8 +14,8 @@ const store = createStoreWithMiddleware(reducers);
 const token = localStorage.getItem('token');
 
 ReactDOM.render(
-
-    <Map />
-
+  <Provider store={store}>
+    <App />
+  </Provider>
   , document.querySelector('.container-fluid')
 );
