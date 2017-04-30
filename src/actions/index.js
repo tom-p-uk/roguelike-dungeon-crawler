@@ -19,3 +19,7 @@ export const checkGameOver = isGameOver => {
 export const checkGameWon = isGameWon => {
   return { type: types.CHECK_GAME_WON, payload: isGameWon };
 }
+
+export const closeModal = () => {
+  return { type: types.CLOSE_MODAL };
+}

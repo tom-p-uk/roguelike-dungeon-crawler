@@ -29,8 +29,8 @@ class Map extends Component {
 
     this.state = {
       map: null,
-      canvasWidth: 700,
-      canvasHeight: 700,
+      canvasWidth: 650,
+      canvasHeight: 650,
       numRows: 37,
       numCols: 37,
       cellWidth: null,
@@ -200,6 +200,7 @@ class Map extends Component {
           break;
       }
     }
+    if (code === 'Space') this.drawCanvas();
   }
 
   changePlayerDirection(direction) {
@@ -211,7 +212,8 @@ class Map extends Component {
 
   isGameOver() {
     if (this.state.player && this.state.boss) {
-      if (this.state.player.living === false || this.state.boss.living === false) this.props.checkGameOver(true);
+      if (this.state.player.living === false) this.props.checkGameOver(true);
+      else if (this.state.boss.living === false) this.props.checkGameWon(true);
       else this.props.checkGameOver(false);
     }
 

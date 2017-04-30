@@ -3,15 +3,19 @@ body {
   background-color: black;
 }
 
-.app {
+.canvas-and-status {
   display: flex;
   justify-content: space-between;
 }
 
 .status-container {
-  flex-basis: 300px;
+  flex-basis: 340px;
   display: flex;
   flex-direction: column;
+}
+
+.status {
+  margin-left: 50px;
 }
 
 .player-status {
@@ -25,11 +29,11 @@ body {
 }
 
 .player-img {
-  width: 30px;
+  width: 45px;
 }
 
 .player-weapon-img {
-  width: 20px;
+  width: 35px;
 }
 
 .enemy-status {
@@ -45,4 +49,15 @@ body {
 
 canvas {
   margin: 0 auto;
+  margin-top: 50px;
+}
+
+.game-over-modal, .game-won-modal {
+  text-align: center;
+  background-color: black;
+}
+
+.play-again-text {
+  margin-top: 25px;
+  font-size: 10px;
 }

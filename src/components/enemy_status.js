@@ -7,7 +7,7 @@ class EnemyStatus extends Component {
     if (!this.props.enemy) return <div></div>
 
     return(
-      <div className="enemy-status">
+      <div className="status enemy-status">
         <div className="enemy">Enemy <img className="enemy-img" src={this.props.enemy.img}/></div>
         <div className="enemy-health">Health: {this.props.enemy.health}</div>
       </div>

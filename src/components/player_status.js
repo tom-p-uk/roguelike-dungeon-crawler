@@ -7,7 +7,7 @@ class PlayerStatus extends Component {
     if (!this.props.player) return <div></div>
 
     return(
-      <div className="player-status">
+      <div className="status player-status">
         <div className="player">Player <img className="player-img" src={this.props.player.img}/></div>
         <div className="player-health">Health: {this.props.health}</div>
         <div className="player-xp">XP: {this.props.xp}</div>
