@@ -17,7 +17,7 @@ export default class Player {
       { type: 'Mace', damage: 35, img: maceImg },
       { type: 'Crossbow', damage: 45, img: crossbowImg },
       { type: 'Sword', damage: 55, img: swordImg }
-    ]
+    ];
     this.weaponIndex = 0;
     this.living = true;
     this.direction = 'down';

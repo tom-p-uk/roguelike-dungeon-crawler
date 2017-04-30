@@ -29,14 +29,15 @@ class Map extends Component {
 
     this.state = {
       map: null,
-      canvasWidth: 850,
-      canvasHeight: 850,
-      numRows: 29,
-      numCols: 29,
+      canvasWidth: 700,
+      canvasHeight: 700,
+      numRows: 37,
+      numCols: 37,
       cellWidth: null,
       cellHeight: null,
       player: null,
       previousTile: null,
+      mapViewDistance: 6,
     };
   }
 
@@ -49,8 +50,6 @@ class Map extends Component {
   componentDidUpdate() {
     this.drawCanvas();
     this.isGameOver();
-    console.log(this.visibleIndexes(this.state.player.row, this.state.player.col, 10));
-    // console.log(this.state.player);
   }
 
   generateMap() {
@@ -97,10 +96,8 @@ class Map extends Component {
 
   // set constants for canvas dimensions
   defineDimensions(canvasWidth, canvasHeight, numCols, numRows) {
-    const cellWidth = canvasWidth / numCols;
-    const cellHeight = canvasHeight / numRows;
-    // const cellWidth = canvasWidth / (numCols / 4);
-    // const cellHeight = canvasHeight / (numRows / 4);
+    const cellWidth = canvasWidth / (this.state.mapViewDistance * 2 + 1);
+    const cellHeight = canvasHeight / (this.state.mapViewDistance * 2 + 1);
     this.setState({ canvasWidth, canvasHeight, cellWidth, cellHeight })
   }
 
@@ -180,26 +177,28 @@ class Map extends Component {
   }
 
   keyDown({ code }) {
-    switch(code) {
-      case 'ArrowUp':
-        this.changePlayerDirection('up');
-        this.checkNextMove(-1, 0);
-        break;
+    if (!this.props.isGameOver && !this.props.isGameWon) {
+      switch(code) {
+        case 'ArrowUp':
+          this.changePlayerDirection('up');
+          this.checkNextMove(-1, 0);
+          break;
 
-      case 'ArrowDown':
-        this.changePlayerDirection('down');
-        this.checkNextMove(1, 0);
-        break;
+        case 'ArrowDown':
+          this.changePlayerDirection('down');
+          this.checkNextMove(1, 0);
+          break;
 
-      case 'ArrowLeft':
-        this.changePlayerDirection('left');
-        this.checkNextMove(0, -1);
-        break;
+        case 'ArrowLeft':
+          this.changePlayerDirection('left');
+          this.checkNextMove(0, -1);
+          break;
 
-      case 'ArrowRight':
-        this.changePlayerDirection('right');
-        this.checkNextMove(0, 1);
-        break;
+        case 'ArrowRight':
+          this.changePlayerDirection('right');
+          this.checkNextMove(0, 1);
+          break;
+      }
     }
   }
 
@@ -228,21 +227,22 @@ class Map extends Component {
     ctx.drawImage(image, col, row, cellWidth, cellHeight);
   }
 
-  visibleIndexes(playerRow, playerCol, distance) {
-    const { numRows, numCols} = this.state;
+  visibleIndexes(playerIndex, numRowsOrCols, distance) {
+    let indexLower = playerIndex - distance;
+    let indexUpper = playerIndex + distance;
 
-    let rowLowerLimit = playerRow - distance;
-    let rowUpperLimit = playerRow + distance;
+    if (indexLower < 0) {
+      console.log(`indexUpper(${indexUpper}) -= indexLower(${indexLower}) = ${indexUpper -= indexLower}`);
+      indexLower -= indexLower;
+      indexUpper -= indexLower;
+    } else if (indexUpper > numRowsOrCols - 1) {
+      const offset = indexUpper - (numRowsOrCols - 1);
 
-    if (rowLowerLimit < 0) {
-      rowLowerLimit -= rowLowerLimit;
-      rowUpperLimit -= rowLowerLimit;
-    } else if (rowUpperLimit > numRows) {
-      rowLowerLimit -= (rowUpperLimit - numRows);
-      rowLowerLimit -= (rowUpperLimit - numRows);
+      indexLower -= offset;
+      indexUpper -= offset;
     }
 
-    return { rowLowerLimit, rowUpperLimit };
+    return { indexLower, indexUpper };
   }
 
   // draw the canvas
@@ -285,19 +285,24 @@ class Map extends Component {
     demon.src = demonImg;
     boss.src = bossImg;
 
-    // const visibleMap =
-    // //
-    //
-    //   for (int y = player.pos.y - display.height / 2; y < display.height; y++)  {
-    //     for (int x = player.pos.x - display.width / 2; x < display.width; x++) {
-    //       //Equivalent VisMap Position = BigMap[x, y];
-    //     }
-    //   }
-    this.state.map.tiles.forEach((row, rowIndex) => {
+    const rowLower = this.visibleIndexes(this.state.player.row, this.state.numRows, this.state.mapViewDistance).indexLower;
+    const rowUpper = this.visibleIndexes(this.state.player.row, this.state.numRows, this.state.mapViewDistance).indexUpper;
+    const colLower = this.visibleIndexes(this.state.player.col, this.state.numCols, this.state.mapViewDistance).indexLower;
+    const colUpper = this.visibleIndexes(this.state.player.col, this.state.numCols, this.state.mapViewDistance).indexUpper;
+
+    const visibleMap = [];
+
+    for (let i = rowLower; i <= rowUpper; i++) {
+      const row = [];
+      for (let j = colLower; j <= colUpper; j++) {
+        row.push(this.state.map.tiles[i][j]);
+      }
+      visibleMap.push(row);
+    }
+
+    visibleMap.forEach((row, rowIndex) => {
       row.forEach((Tile, cellIndex) => {
         const ctx = this.refs.canvas.getContext('2d');
-
-
 
         if (Tile.type === 'floor' || Tile.type === 'door') this.drawImage(ctx, floor, cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
         else if (Tile.type === 'wall') this.drawImage(ctx, wall, cellWidth * cellIndex, cellHeight * rowIndex, cellWidth, cellHeight);
@@ -334,4 +339,8 @@ class Map extends Component {
   }
 };
 
-export default connect(null, actions)(Map);
+const mapStateToProps = state => {
+  return { isGameOver: state.isGameOver, isGameWon: state.isGameWon };
+}
+
+export default connect(mapStateToProps, actions)(Map);
