@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const VENDOR_LIBS = ['react', 'react-dom', 'react-redux', 'redux'];
+const VENDOR_LIBS = ['react', 'react-dom'];
 
 module.exports = {
   entry: {

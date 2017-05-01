@@ -31,8 +31,8 @@ class Map extends Component {
       map: null,
       canvasWidth: 650,
       canvasHeight: 650,
-      numRows: 41,
-      numCols: 41,
+      numRows: 47,
+      numCols: 47,
       cellWidth: null,
       cellHeight: null,
       player: null,
@@ -402,7 +402,7 @@ class Map extends Component {
   }
 
   render() {
-    if (!this.props.gameStarted) return <canvas ref="canvas" width={0} height={0}/>
+    if (!this.props.gameStarted) return <canvas ref="canvas" width={0} height={0} />
 
     return(
       <canvas
