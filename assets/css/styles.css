@@ -1,7 +1,22 @@
+/******************** MAIN APP ********************/
+
 body {
   font-family: 'Press Start 2P', cursive;
   background-color: black;
 }
+
+canvas {
+  flex-basis: 650px;
+  flex: 3;
+  margin: 0 auto;
+  margin-top: 50px;
+}
+
+.empty-div {
+  flex: 2;
+}
+
+/******************** STATUS CONTAINER ********************/
 
 .canvas-and-status {
   display: flex;
@@ -9,14 +24,16 @@ body {
 }
 
 .status-container {
-  flex-basis: 340px;
+  flex: 2;
   display: flex;
   flex-direction: column;
 }
 
 .status {
-  margin-left: 50px;
+  margin-left: 80px;
 }
+
+/******************** PLAYER STATUS ********************/
 
 .player-status {
   color: white;
@@ -36,6 +53,8 @@ body {
   width: 35px;
 }
 
+/******************** ENEMY STATUS ********************/
+
 .enemy-status {
   color: white;
 }
@@ -47,10 +66,7 @@ body {
   width: 40px;
 }
 
-canvas {
-  margin: 0 auto;
-  margin-top: 50px;
-}
+/******************** MODALS ********************/
 
 .game-over-modal, .game-won-modal {
   text-align: center;
@@ -60,4 +76,50 @@ canvas {
 .play-again-text {
   margin-top: 25px;
   font-size: 10px;
+}
+
+/******************** GAME INSTRUCTIONS ********************/
+
+.game-instructions-container {
+  color: gray;
+  /*margin-top: 100px;*/
+  max-width: 700px;
+  margin: 100px auto 0 auto;
+  text-align: center;
+}
+
+.game-instructions-enemies {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 40px;
+}
+
+.game-instructions-boss {
+  margin-bottom: 40px;
+}
+
+.game-instructions-enemy {
+  display: flex;
+  flex-direction: column;
+  /*align-self: center;*/
+}
+
+.game-instructions-enemy-img, .game-instructions-boss-img {
+  align-self: center;
+  width: 50px;
+}
+
+.game-title {
+  margin-bottom: 50px;
+  color: white;
+  font-size: 30px;
+}
+
+.instructions {
+  margin-bottom: 50px;
+}
+
+.game-instructions-enemies-title, .game-instructions-boss-title, .instructions-heading {
+  color: white;
+  margin-bottom: 8px;
 }

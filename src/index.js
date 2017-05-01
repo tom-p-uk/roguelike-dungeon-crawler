@@ -6,7 +6,6 @@ import reducers from './reducers';
 
 import '../assets/css/styles.css';
 import App from './components/app';
-import Map from './components/map';
 
 const createStoreWithMiddleware = applyMiddleware()(createStore);
 const store = createStoreWithMiddleware(reducers);

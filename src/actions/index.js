@@ -1,9 +1,5 @@
 import * as types from './types';
 
-export const updateMap = map => {
-  return { type: types.UPDATE_MAP, payload: map };
-}
-
 export const updatePlayer = player => {
   return { type: types.UPDATE_PLAYER, payload: player };
 }
@@ -22,4 +18,12 @@ export const checkGameWon = isGameWon => {
 
 export const closeModal = () => {
   return { type: types.CLOSE_MODAL };
+}
+
+export const startGame = () => {
+  return { type: types.START_GAME };
+}
+
+export const restartGame = () => {
+  return { type: types.RESTART_GAME };
 }

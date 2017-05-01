@@ -1,12 +1,9 @@
 import * as types from '../actions/types';
 
-const initialState = { gameOverIsOpen: false, gameWonIsOpen: false };
+const initialState = { gameStarted: false, gameOverIsOpen: false, gameWonIsOpen: false };
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case types.UPDATE_MAP:
-      return { ...state,  map: action.payload };
-
     case types.UPDATE_PLAYER:
       return { ...state, player: action.payload };
 
@@ -22,6 +19,21 @@ export default (state = initialState, action) => {
     case types.CLOSE_MODAL: {
       return { ...state, gameOverIsOpen: false, gameWonIsOpen: false };
     }
+
+    case types.START_GAME: {
+      return { ...state, gameStarted: true };
+    }
+
+    case types.RESTART_GAME: {
+      return {
+        ...state,
+        gameOverIsOpen: false,
+        gameWonIsOpen: false,
+        player: undefined,
+        enemy: undefined
+      };
+    }
+
     default:
       return state;
   }
